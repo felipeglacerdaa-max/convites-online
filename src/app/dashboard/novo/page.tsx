@@ -1,24 +1,82 @@
 'use client';
 
-import { useState } from 'react';
-import { ArrowLeft, Save, Plus, Music, Film, MapPin, Calendar, Clock, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, Save, Plus, Music, Film, MapPin, Calendar, Clock, Image as ImageIcon, Sparkles, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
+
+const supabase = createClient();
 
 export default function NewInvitation() {
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
+
   const [formData, setFormData] = useState({
     title: 'Meu Evento Especial',
     date: '2026-06-15',
     time: '19:00',
     location: 'Endereço do Evento',
     message: 'Esperamos você para comemorar conosco esse momento inesquecível!',
-    imageUrl: '/assets/img/template_casamento.png',
+    imageUrl: '',
     videoUrl: '',
     musicUrl: '',
     template: '1'
   });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push('/login');
+      } else {
+        setUser(user);
+      }
+      setLoadingAuth(false);
+    };
+    checkUser();
+  }, [router]);
+
+  if (loadingAuth) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="animate-spin text-purple-600 w-10 h-10" />
+      </div>
+    );
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/invitation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        router.push(`/dashboard?created=true`);
+      } else {
+        setError(data.message || 'Erro ao criar convite.');
+      }
+    } catch (err) {
+      setError('Algo deu errado. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -40,32 +98,38 @@ export default function NewInvitation() {
             <p className="text-slate-500 mt-2">Preencha os dados abaixo e veja a mágica acontecer.</p>
           </header>
 
-          <div className="space-y-8">
+          {error && (
+            <div className="bg-rose-50 text-rose-600 p-4 rounded-xl text-sm font-medium border border-rose-100 mb-8">
+              {error}
+            </div>
+          )}
+
+          <form className="space-y-8" onSubmit={handleSubmit}>
             {/* Info Section */}
             <div className="space-y-4">
               <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">Informações Básicas</h3>
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold text-slate-700">Título do Evento</label>
-                  <input name="title" value={formData.title} onChange={handleChange} className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all" />
+                  <input name="title" value={formData.title} onChange={handleChange} required className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-sm font-semibold text-slate-700">Data</label>
-                    <input name="date" type="date" value={formData.date} onChange={handleChange} className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all font-sans" />
+                    <input name="date" type="date" value={formData.date} onChange={handleChange} required className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all font-sans" />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-sm font-semibold text-slate-700">Hora</label>
-                    <input name="time" type="time" value={formData.time} onChange={handleChange} className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all font-sans" />
+                    <input name="time" type="time" value={formData.time} onChange={handleChange} required className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all font-sans" />
                   </div>
                 </div>
                  <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700 text-slate-700">Localização</label>
-                  <input name="location" value={formData.location} onChange={handleChange} className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all" />
+                  <label className="text-sm font-semibold text-slate-700">Localização</label>
+                  <input name="location" value={formData.location} onChange={handleChange} required className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all" />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold text-slate-700">Mensagem de Boas-vindas</label>
-                  <textarea name="message" value={formData.message} onChange={handleChange} rows={4} className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all resize-none"></textarea>
+                  <textarea name="message" value={formData.message} onChange={handleChange} required rows={4} className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all resize-none"></textarea>
                 </div>
               </div>
             </div>
@@ -95,10 +159,15 @@ export default function NewInvitation() {
               </div>
             </div>
 
-            <button className="w-full bg-purple-600 text-white font-bold py-5 rounded-[2rem] shadow-2xl shadow-purple-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
-              <Save size={20} /> Salvar e Gerar Link
+            <button 
+              type="submit"
+              disabled={loading}
+              className="w-full bg-purple-600 text-white font-bold py-5 rounded-[2rem] shadow-2xl shadow-purple-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+            >
+              {loading ? <Loader2 className="animate-spin" /> : <Save size={20} />} 
+              {loading ? 'Salvando...' : 'Salvar e Gerar Link'}
             </button>
-          </div>
+          </form>
         </div>
       </div>
 
@@ -142,29 +211,10 @@ export default function NewInvitation() {
                   </p>
                 </div>
 
-                {formData.videoUrl && (
-                  <div className="aspect-video bg-slate-100 rounded-2xl flex items-center justify-center overflow-hidden">
-                     <span className="text-xs text-slate-400 font-bold">VÍDEO CARREGADO</span>
-                  </div>
-                )}
-
                 <div className="pt-6">
                    <button className="w-full bg-purple-600 text-white font-bold py-4 rounded-2xl text-center text-xs tracking-widest uppercase">Confirmar Presença</button>
                 </div>
              </div>
-
-             {/* Music Player Mockup Mini */}
-             {formData.musicUrl && (
-               <div className="sticky bottom-4 mx-4 bg-white/90 backdrop-blur-md border border-slate-100 shadow-xl rounded-2xl p-4 flex items-center gap-4 animate-in slide-in-from-bottom-4 duration-500">
-                 <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center animate-spin-slow">
-                   <Music size={18} className="text-white" />
-                 </div>
-                 <div className="flex-1 overflow-hidden">
-                   <div className="text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-0.5">Tocando Agora</div>
-                   <div className="text-xs font-bold text-slate-800 truncate">Música do Evento</div>
-                 </div>
-               </div>
-             )}
           </div>
         </div>
 

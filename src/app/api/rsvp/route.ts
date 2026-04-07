@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
@@ -9,11 +10,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Nome e ID do convite são necessários.' }, { status: 400 });
     }
 
-    // Mock DB Store
-    console.log(`Confirmado RSVP de ${name} para o convite ${invitationId}`);
+    const rsvp = await prisma.rSVP.create({
+      data: {
+        name,
+        invitationId,
+        confirmed: true,
+      },
+    });
 
-    return NextResponse.json({ success: true, message: 'RSVP confirmado com sucesso!' });
-  } catch (error) {
-     return NextResponse.json({ error: 'Erro ao processar RSVP.' }, { status: 500 });
+    console.log(`Confirmado RSVP:`, rsvp);
+
+    return NextResponse.json({ success: true, message: 'RSVP confirmado com sucesso!', id: rsvp.id });
+  } catch (error: any) {
+    console.error("Erro no RSVP:", error);
+    return NextResponse.json({ error: 'Erro ao processar RSVP.', message: error.message }, { status: 500 });
   }
 }

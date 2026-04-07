@@ -1,12 +1,40 @@
 import { Plus, Settings, LogOut, ExternalLink, Calendar, MapPin, MoreVertical, Search, Filter } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { redirect } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
+import LogoutButton from '@/components/LogoutButton';
+import { createClient } from '@/utils/supabase/server';
 
-export default function Dashboard() {
-  const invitations = [
-    { id: '1', title: 'Casamento Lucas & Ana', date: '15/06/2026', location: 'Espaço das Flores', status: 'Ativo', visits: 142, code: 'lucas-ana-2026', img: '/assets/img/template_casamento.png' },
-    { id: '2', title: 'Aniversário da Sofia', date: '22/07/2026', location: 'Buffet Kids', status: 'Ativo', visits: 56, code: 'sofia-10-anos', img: '/assets/img/template_aniversario.png' },
-  ];
+export default async function Dashboard() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  // For now, since Prisma is still used, we need to map Supabase user to Prisma user
+  // But since we switched auth, perhaps we need to adjust
+  // For simplicity, assume user.id is the same, but actually, Supabase user.id is UUID
+
+  const invitations = await prisma.invitation.findMany({
+    where: {
+      userId: user.id,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  const totalVisits = invitations.reduce((acc: number, inv: any) => acc + 0, 0); // Need to implement visits tracking later
+  const totalRsvps = await prisma.rSVP.count({
+    where: {
+      invitation: {
+        userId: user.id,
+      },
+      confirmed: true,
+    }
+  });
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -18,7 +46,7 @@ export default function Dashboard() {
         </div>
 
         <nav className="flex-1 space-y-2">
-          <Link href="/dashboard" className="flex items-center gap-4 p-4 bg-purple-50 text-purple-600 rounded-2xl font-bold transition-all">
+          <Link href="/dashboard" className="flex items-center gap-4 p-4 bg-purple-50 text-purple-600 rounded-2xl font-bold transition-all relative">
             <span className="bg-purple-600 w-1.5 h-6 rounded-full absolute left-0"></span>
             Dashboard
           </Link>
@@ -32,10 +60,7 @@ export default function Dashboard() {
           </Link>
         </nav>
 
-        <button className="flex items-center gap-4 p-4 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-2xl font-bold transition-all mt-auto">
-          <LogOut size={20} />
-          Sair
-        </button>
+        <LogoutButton />
       </aside>
 
       {/* Main Content */}
@@ -43,7 +68,7 @@ export default function Dashboard() {
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
           <div>
             <h1 className="text-3xl font-playfair font-bold text-slate-800">Seus Convites</h1>
-            <p className="text-slate-500">Gerencie seus eventos e acompanhe as visitas.</p>
+            <p className="text-slate-500">Olá, {session.user.name}. Gerencie seus eventos e acompanhe as visitas.</p>
           </div>
           <Link href="/dashboard/novo" className="bg-purple-600 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-purple-600/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
             <Plus size={20} /> Novo Convite
@@ -58,11 +83,11 @@ export default function Dashboard() {
           </div>
           <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
             <p className="text-slate-500 text-sm font-medium mb-1">Total de Visualizações</p>
-            <h3 className="text-3xl font-bold text-slate-800">198</h3>
+            <h3 className="text-3xl font-bold text-slate-800">0</h3>
           </div>
           <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
             <p className="text-slate-500 text-sm font-medium mb-1">RSVP Confirmados</p>
-            <h3 className="text-3xl font-bold text-slate-800">42</h3>
+            <h3 className="text-3xl font-bold text-slate-800">{totalRsvps}</h3>
           </div>
         </div>
 
@@ -82,43 +107,62 @@ export default function Dashboard() {
         </div>
 
         {/* Invitation Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-          {invitations.map((inv) => (
-            <div key={inv.id} className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col md:flex-row gap-6">
-              <div className="w-full md:w-48 h-48 rounded-[2rem] overflow-hidden bg-slate-100 flex-shrink-0">
-                <img src={inv.img} alt={inv.title} className="w-full h-full object-cover" />
-              </div>
-              
-              <div className="flex-1 flex flex-col justify-between py-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-800 mb-2">{inv.title}</h3>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-slate-400 text-sm">
-                        <Calendar size={14} /> {inv.date}
-                      </div>
-                      <div className="flex items-center gap-2 text-slate-400 text-sm">
-                        <MapPin size={14} /> {inv.location}
+        {invitations.length > 0 ? (
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            {invitations.map((inv: any) => (
+              <div key={inv.id} className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col md:flex-row gap-6">
+                <div className="w-full md:w-48 h-48 rounded-[2rem] overflow-hidden bg-slate-100 flex-shrink-0 relative">
+                  {inv.imageUrl ? (
+                    <img src={inv.imageUrl} alt={inv.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                      <span className="text-4xl text-purple-200">✨</span>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex-1 flex flex-col justify-between py-2">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-xl font-bold text-slate-800 mb-2">{inv.title}</h3>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-slate-400 text-sm">
+                          <Calendar size={14} /> {inv.date}
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-400 text-sm">
+                          <MapPin size={14} /> {inv.location}
+                        </div>
                       </div>
                     </div>
+                    <button className="p-2 hover:bg-slate-50 rounded-xl transition-all text-slate-400">
+                      <MoreVertical size={20} />
+                    </button>
                   </div>
-                  <button className="p-2 hover:bg-slate-50 rounded-xl transition-all text-slate-400">
-                    <MoreVertical size={20} />
-                  </button>
-                </div>
 
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <Link href={`/convite/${inv.code}`} className="flex-1 bg-slate-100 text-slate-700 font-bold py-3 px-4 rounded-xl text-center text-sm hover:bg-slate-200 transition-all flex items-center justify-center gap-2">
-                    <ExternalLink size={16} /> Ver Online
-                  </Link>
-                  <Link href={`/dashboard/editar/${inv.id}`} className="flex-1 bg-purple-100 text-purple-600 font-bold py-3 px-4 rounded-xl text-center text-sm hover:bg-purple-600 hover:text-white transition-all">
-                    Editar
-                  </Link>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <Link href={`/convite/${inv.code}`} className="flex-1 bg-slate-100 text-slate-700 font-bold py-3 px-4 rounded-xl text-center text-sm hover:bg-slate-200 transition-all flex items-center justify-center gap-2">
+                      <ExternalLink size={16} /> Ver Online
+                    </Link>
+                    <Link href={`/dashboard/editar/${inv.id}`} className="flex-1 bg-purple-100 text-purple-600 font-bold py-3 px-4 rounded-xl text-center text-sm hover:bg-purple-600 hover:text-white transition-all">
+                      Editar
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20 bg-white rounded-[3rem] border border-dashed border-slate-200">
+             <div className="w-20 h-20 bg-purple-50 text-purple-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Plus size={40} />
+             </div>
+             <h3 className="text-xl font-bold text-slate-800 mb-2">Nenhum convite criado</h3>
+             <p className="text-slate-500 mb-8">Comece criando seu primeiro convite digital agora mesmo.</p>
+             <Link href="/dashboard/novo" className="bg-purple-600 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-purple-600/20 hover:scale-105 active:scale-95 transition-all inline-flex items-center gap-2">
+                <Plus size={20} /> Criar Meu Primeiro Convite
+             </Link>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -25,7 +25,6 @@ export default function Home() {
             <a href="#templates" className="text-slate-600 hover:text-purple-600 transition-colors font-medium">Modelos</a>
             <a href="#funciona" className="text-slate-600 hover:text-purple-600 transition-colors font-medium">Como Funciona</a>
             <a href="/login" className="text-slate-900 font-semibold border-2 border-purple-600 px-6 py-2 rounded-full hover:bg-purple-600 hover:text-white transition-all">Entrar</a>
-            <a href="/dashboard/novo" className="bg-purple-600 text-white px-6 py-2 rounded-full font-semibold shadow-lg shadow-purple-600/30 hover:-translate-y-0.5 transition-all">Criar Convite</a>
           </div>
         </nav>
       </header>
@@ -94,8 +93,8 @@ export default function Home() {
                   <span className="text-xs font-bold uppercase tracking-wider text-purple-600 mb-2 block">{tpl.category}</span>
                   <h3 className="text-xl font-bold mb-1">{tpl.name}</h3>
                   <p className="text-slate-500 text-sm mb-6">{tpl.desc}</p>
-                  <Link href={`/dashboard/novo?template=${tpl.id}`} className="w-full bg-slate-50 group-hover:bg-purple-600 group-hover:text-white text-slate-700 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all">
-                    Escolher este <ChevronRight size={18} />
+                  <Link href="/login" className="w-full bg-slate-50 group-hover:bg-purple-600 group-hover:text-white text-slate-700 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all">
+                    Entrar para criar <ChevronRight size={18} />
                   </Link>
                 </div>
               </div>

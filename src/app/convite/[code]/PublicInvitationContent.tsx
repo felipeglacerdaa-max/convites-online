@@ -1,26 +1,35 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Music, MapPin, Calendar, Clock, Video, Heart, Share2, Check } from 'lucide-react';
+import { useState } from 'react';
+import { Music, MapPin, Calendar, Clock, Video, Heart, Share2, Check, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function PublicInvitation({ params }: { params: { id: string } }) {
+export default function PublicInvitationContent({ invitation }: { invitation: any }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [rsvpSent, setRsvpSent] = useState(false);
-  
-  // Mock Data (will be fetched from DB later)
-  const invitation = {
-    title: 'Casamento Lucas & Ana',
-    date: '15 Junho 2026',
-    time: '19:00',
-    location: 'Espaço das Flores, Av. Paulista 1000, SP',
-    message: 'Nossa história ganha um novo capítulo e adoraríamos que você fizesse parte desse momento inesquecível!',
-    imageUrl: '/assets/img/template_casamento.png',
-    videoUrl: 'https://youtube.com/watch?v=mock',
-    musicUrl: 'https://youtube.com/watch?v=music-mock',
-  };
+  const [loading, setLoading] = useState(false);
+  const [rsvpName, setRsvpName] = useState('');
 
   const toggleMusic = () => setIsPlaying(!isPlaying);
+
+  const handleRsvp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: rsvpName, invitationId: invitation.id }),
+      });
+      if (res.ok) {
+        setRsvpSent(true);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-purple-100 overflow-x-hidden">
@@ -32,12 +41,14 @@ export default function PublicInvitation({ params }: { params: { id: string } })
 
       <main className="relative z-10 max-w-2xl mx-auto px-6 py-12 space-y-12 pb-32">
         {/* Floating Music Toggle */}
-        <button 
-          onClick={toggleMusic}
-          className={`fixed top-6 right-6 p-4 rounded-full shadow-2xl transition-all duration-500 z-50 ${isPlaying ? 'bg-purple-600 text-white animate-spin-slow' : 'bg-white text-slate-400'}`}
-        >
-          <Music size={24} />
-        </button>
+        {invitation.musicUrl && (
+          <button 
+            onClick={toggleMusic}
+            className={`fixed top-6 right-6 p-4 rounded-full shadow-2xl transition-all duration-500 z-50 ${isPlaying ? 'bg-purple-600 text-white animate-spin-slow' : 'bg-white text-slate-400'}`}
+          >
+            <Music size={24} />
+          </button>
+        )}
 
         {/* Hero Section */}
         <motion.section 
@@ -46,7 +57,7 @@ export default function PublicInvitation({ params }: { params: { id: string } })
           transition={{ duration: 0.8 }}
           className="relative rounded-[3rem] overflow-hidden shadow-2xl shadow-purple-600/10 aspect-[3/4] group"
         >
-          <img src={invitation.imageUrl} alt={invitation.title} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-1000" />
+          <img src={invitation.imageUrl || '/assets/img/template_casamento.png'} alt={invitation.title} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-1000" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
           <div className="absolute bottom-12 left-10 right-10 text-white space-y-2">
             <motion.span 
@@ -98,16 +109,39 @@ export default function PublicInvitation({ params }: { params: { id: string } })
           </button>
         </motion.section>
 
+        {/* Video Side (If URL exists) */}
+        {invitation.videoUrl && (
+          <motion.section 
+             initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
+             className="bg-white p-6 rounded-[3rem] shadow-xl border border-slate-50 overflow-hidden"
+          >
+             <div className="aspect-video w-full bg-slate-100 rounded-2xl flex items-center justify-center relative overflow-hidden group">
+                <Video size={48} className="text-slate-300 group-hover:scale-110 transition-transform" />
+                <div className="absolute bottom-4 left-4 right-4 bg-white/20 backdrop-blur-md px-4 py-2 rounded-xl text-white text-xs font-bold tracking-widest">ASSISTIR VÍDEO COMPLETO</div>
+             </div>
+          </motion.section>
+        )}
+
         {/* RSVP Section */}
         <section id="rsvp" className="bg-purple-600 p-12 rounded-[3.5rem] shadow-2xl shadow-purple-600/30 text-white text-center">
             <h2 className="text-3xl font-playfair font-bold mb-4">Confirmar Presença</h2>
             <p className="opacity-80 mb-10 text-sm max-w-xs mx-auto">Sua presença é fundamental para tornar este dia ainda mais especial.</p>
             
             {!rsvpSent ? (
-               <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setRsvpSent(true); }}>
-                  <input type="text" placeholder="Seu Nome Completo" required className="w-full bg-white/10 border border-white/20 rounded-2xl p-5 outline-none focus:bg-white/20 transition-all placeholder:text-white/50 font-semibold" />
-                  <button className="w-full bg-white text-purple-600 font-bold py-5 rounded-2xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all">
-                    Confirmar Agora
+               <form className="space-y-4" onSubmit={handleRsvp}>
+                  <input 
+                    type="text" 
+                    required 
+                    value={rsvpName}
+                    onChange={(e) => setRsvpName(e.target.value)}
+                    placeholder="Seu Nome Completo" 
+                    className="w-full bg-white/10 border border-white/20 rounded-2xl p-5 outline-none focus:bg-white/20 transition-all placeholder:text-white/50 font-semibold" 
+                  />
+                  <button 
+                    disabled={loading}
+                    className="w-full bg-white text-purple-600 font-bold py-5 rounded-2xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                  >
+                    {loading ? <Loader2 className="animate-spin" /> : 'Confirmar Agora'}
                   </button>
                </form>
             ) : (
