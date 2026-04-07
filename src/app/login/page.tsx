@@ -1,13 +1,14 @@
 'use client';
+export const dynamic = 'force-dynamic';
 import { Mail, Lock, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
 const supabase = createClient();
 
-export default function Login() {
+function LoginContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -112,5 +113,13 @@ export default function Login() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={null}>
+      <LoginContent />
+    </Suspense>
   );
 }

@@ -6,7 +6,7 @@ import LogoutButton from '@/components/LogoutButton';
 import { createClient } from '@/utils/supabase/server';
 
 export default async function Dashboard() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -68,7 +68,7 @@ export default async function Dashboard() {
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
           <div>
             <h1 className="text-3xl font-playfair font-bold text-slate-800">Seus Convites</h1>
-            <p className="text-slate-500">Olá, {session.user.name}. Gerencie seus eventos e acompanhe as visitas.</p>
+            <p className="text-slate-500">Olá, {user?.email || 'usuário'}. Gerencie seus eventos e acompanhe as visitas.</p>
           </div>
           <Link href="/dashboard/novo" className="bg-purple-600 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-purple-600/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
             <Plus size={20} /> Novo Convite

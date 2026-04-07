@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Music, MapPin, Calendar, Clock, Video, Heart, Share2, Check, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Music, MapPin, Calendar, Clock, Video, Heart, Share2, Check, Plus, Loader2 } from 'lucide-react';
 
 export default function PublicInvitationContent({ invitation }: { invitation: any }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -51,30 +50,19 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
         )}
 
         {/* Hero Section */}
-        <motion.section 
-          initial={{ opacity: 0, y: 30 }} 
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="relative rounded-[3rem] overflow-hidden shadow-2xl shadow-purple-600/10 aspect-[3/4] group"
-        >
+        <section className="relative rounded-[3rem] overflow-hidden shadow-2xl shadow-purple-600/10 aspect-[3/4] group">
           <img src={invitation.imageUrl || '/assets/img/template_casamento.png'} alt={invitation.title} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-1000" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
           <div className="absolute bottom-12 left-10 right-10 text-white space-y-2">
-            <motion.span 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-              className="text-xs font-bold uppercase tracking-[0.3em] opacity-80"
-            >
+            <span className="text-xs font-bold uppercase tracking-[0.3em] opacity-80">
               Você está convidado para
-            </motion.span>
+            </span>
             <h1 className="text-4xl md:text-5xl font-playfair font-bold">{invitation.title}</h1>
           </div>
-        </motion.section>
+        </section>
 
         {/* Information Section */}
-        <motion.section 
-           initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-           className="bg-white p-10 rounded-[3rem] shadow-xl shadow-slate-200/50 border border-slate-50 space-y-10 text-center"
-        >
+        <section className="bg-white p-10 rounded-[3rem] shadow-xl shadow-slate-200/50 border border-slate-50 space-y-10 text-center">
           <div className="space-y-4">
              <Heart className="mx-auto text-rose-500" size={32} />
              <p className="font-playfair italic text-xl text-slate-600 leading-relaxed max-w-md mx-auto">
@@ -107,19 +95,16 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
           <button className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 mx-auto hover:bg-purple-600 transition-all shadow-xl shadow-slate-900/20 active:scale-95">
              <MapPin size={18} /> Ver no Mapa
           </button>
-        </motion.section>
+        </section>
 
         {/* Video Side (If URL exists) */}
         {invitation.videoUrl && (
-          <motion.section 
-             initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-             className="bg-white p-6 rounded-[3rem] shadow-xl border border-slate-50 overflow-hidden"
-          >
+          <section className="bg-white p-6 rounded-[3rem] shadow-xl border border-slate-50 overflow-hidden">
              <div className="aspect-video w-full bg-slate-100 rounded-2xl flex items-center justify-center relative overflow-hidden group">
                 <Video size={48} className="text-slate-300 group-hover:scale-110 transition-transform" />
                 <div className="absolute bottom-4 left-4 right-4 bg-white/20 backdrop-blur-md px-4 py-2 rounded-xl text-white text-xs font-bold tracking-widest">ASSISTIR VÍDEO COMPLETO</div>
              </div>
-          </motion.section>
+          </section>
         )}
 
         {/* RSVP Section */}
@@ -145,16 +130,13 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
                   </button>
                </form>
             ) : (
-               <motion.div 
-                 initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                 className="bg-white/10 p-10 rounded-3xl flex flex-col items-center gap-4"
-               >
+               <div className="bg-white/10 p-10 rounded-3xl flex flex-col items-center gap-4">
                   <div className="w-16 h-16 bg-white text-purple-600 rounded-full flex items-center justify-center shadow-lg">
                     <Check size={32} strokeWidth={3} />
                   </div>
                   <h3 className="text-xl font-bold">Confirmado!</h3>
                   <p className="text-sm opacity-80">Obrigado por confirmar sua presença.</p>
-               </motion.div>
+               </div>
             )}
         </section>
 
