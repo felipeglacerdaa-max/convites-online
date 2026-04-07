@@ -82,10 +82,7 @@ function LoginContent() {
           </div>
 
           <div className="space-y-2">
-            <div className="flex justify-between items-center px-1">
-              <label className="text-sm font-semibold text-slate-700">Senha</label>
-              <a href="#" className="text-xs text-purple-600 font-bold hover:underline">Esqueci a senha</a>
-            </div>
+            <label className="text-sm font-semibold text-slate-700">Senha</label>
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
               <input 
@@ -107,10 +104,6 @@ function LoginContent() {
             {loading ? <Loader2 className="animate-spin" /> : 'Entrar'}
           </button>
         </form>
-
-        <p className="text-center text-slate-500 text-sm">
-          Ainda não tem conta? <Link href="/register" className="text-purple-600 font-bold hover:underline">Crie agora grátis</Link>
-        </p>
       </div>
     </div>
   );
