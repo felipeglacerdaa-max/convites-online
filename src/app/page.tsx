@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Sparkles, Music, Camera, Heart, ChevronRight } from 'lucide-react';
+import { Sparkles, Music, Camera, Heart, ChevronRight, Settings } from 'lucide-react';
 
 export default function Home() {
   const templates = [
@@ -24,8 +24,12 @@ export default function Home() {
           <div className="hidden md:flex items-center gap-8">
             <a href="#templates" className="text-slate-600 hover:text-purple-600 transition-colors font-medium">Modelos</a>
             <a href="#funciona" className="text-slate-600 hover:text-purple-600 transition-colors font-medium">Como Funciona</a>
-            <a href="/login" className="text-slate-900 font-semibold border-2 border-purple-600 px-6 py-2 rounded-full hover:bg-purple-600 hover:text-white transition-all">Entrar</a>
+            <a href="/orcamento" className="text-slate-900 font-semibold border-2 border-green-500 px-6 py-2 rounded-full hover:bg-green-500 hover:text-white transition-all">Orcamento</a>
           </div>
+
+          <Link href="/dashboard/admin" className="text-slate-400 hover:text-slate-600 transition-colors p-2">
+            <Settings size={20} />
+          </Link>
         </nav>
       </header>
 
@@ -79,7 +83,11 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {templates.map((tpl) => (
+            {templates.map((tpl) => {
+              const whatsappMessage = `Olá! Estou interessado no template "${tpl.name}" (${tpl.category}). Gostaria de saber mais sobre orçamento e funcionalidades.`;
+              const whatsappLink = `https://wa.me/5531997364681?text=${encodeURIComponent(whatsappMessage)}`;
+              
+              return (
               <div key={tpl.id} className="group bg-white rounded-3xl overflow-hidden border border-slate-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
                 <div className="relative h-96 overflow-hidden">
                   <img src={tpl.img} alt={tpl.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -93,12 +101,13 @@ export default function Home() {
                   <span className="text-xs font-bold uppercase tracking-wider text-purple-600 mb-2 block">{tpl.category}</span>
                   <h3 className="text-xl font-bold mb-1">{tpl.name}</h3>
                   <p className="text-slate-500 text-sm mb-6">{tpl.desc}</p>
-                  <Link href="/login" className="w-full bg-slate-50 group-hover:bg-purple-600 group-hover:text-white text-slate-700 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all">
-                    Entrar para criar <ChevronRight size={18} />
-                  </Link>
+                  <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="w-full bg-slate-50 group-hover:bg-green-500 group-hover:text-white text-slate-700 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all">
+                    Solicitar Orçamento <ChevronRight size={18} />
+                  </a>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 

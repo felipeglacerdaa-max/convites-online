@@ -32,7 +32,6 @@ function LoginContent() {
         setError('Email ou senha incorretos.');
       } else {
         router.push('/dashboard');
-        router.refresh();
       }
     } catch (err) {
       setError('Algo deu errado. Tente novamente.');
