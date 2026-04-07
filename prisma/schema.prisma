@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String       @id @default(uuid())
+  name      String?
+  email     String?      @unique
+  password  String?
+  invitations Invitation[]
+}
+
+model Invitation {
+  id          String   @id @default(uuid())
+  title       String
+  date        String
+  time        String
+  location    String
+  message     String
+  imageUrl    String?
+  videoUrl    String?
+  musicUrl    String?
+  template    String   @default("1")
+  code        String   @unique // Short code for the URL /convite/code
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  rsvps       RSVP[]
+}
+
+model RSVP {
+  id           String     @id @default(uuid())
+  name         String
+  confirmed    Boolean    @default(true)
+  invitationId String
+  invitation   Invitation @relation(fields: [invitationId], references: [id])
+  createdAt    DateTime   @default(now())
+}
