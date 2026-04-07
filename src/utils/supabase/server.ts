@@ -2,11 +2,17 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export async function createClient() {
+  const url = process.env.SUPABASE_URL;
+  const anonKey = process.env.SUPABASE_ANON_KEY;
+  if (!url || !anonKey) {
+    throw new Error('Supabase server env vars are missing. Set SUPABASE_URL and SUPABASE_ANON_KEY in Vercel environment variables.');
+  }
+
   const cookieStore = await cookies()
 
   return createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
+    url,
+    anonKey,
     {
       cookies: {
         getAll() {

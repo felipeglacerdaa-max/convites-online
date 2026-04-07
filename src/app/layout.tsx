@@ -14,7 +14,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Convite Online | Convites Digitais Premium",
+  title: "Delicatta | Convites Digitais Premium",
   description: "Crie convites digitais modernos para seus eventos especiais. Adicione música, vídeo e fotos.",
 };
 

@@ -7,34 +7,57 @@ import { createClient } from '@/utils/supabase/server';
 
 export default async function Dashboard() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     redirect('/login');
   }
 
-  // For now, since Prisma is still used, we need to map Supabase user to Prisma user
-  // But since we switched auth, perhaps we need to adjust
-  // For simplicity, assume user.id is the same, but actually, Supabase user.id is UUID
+  let invitations: Array<any> = [];
+  let totalRsvps = 0;
+  let dashboardError: string | null = null;
 
-  const invitations = await prisma.invitation.findMany({
-    where: {
-      userId: user.id,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
-
-  const totalVisits = invitations.reduce((acc: number, inv: any) => acc + 0, 0); // Need to implement visits tracking later
-  const totalRsvps = await prisma.rSVP.count({
-    where: {
-      invitation: {
+  try {
+    invitations = await prisma.invitation.findMany({
+      where: {
         userId: user.id,
       },
-      confirmed: true,
-    }
-  });
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    totalRsvps = await prisma.rSVP.count({
+      where: {
+        invitation: {
+          userId: user.id,
+        },
+        confirmed: true,
+      },
+    });
+  } catch (error: any) {
+    console.error('Dashboard data fetch failed:', error);
+    dashboardError = error?.message || 'Erro ao carregar os dados do painel.';
+  }
+
+  if (dashboardError) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+        <div className="max-w-2xl w-full bg-white rounded-[2.5rem] border border-slate-200 p-10 text-center shadow-xl">
+          <h1 className="text-3xl font-bold text-slate-900 mb-4">Não foi possível carregar o painel</h1>
+          <p className="text-slate-600 mb-6">
+            Verifique se o banco de dados está configurado corretamente e se as migrações foram aplicadas.
+          </p>
+          <p className="text-sm text-rose-600 font-medium mb-8">{dashboardError}</p>
+          <Link href="/" className="inline-flex items-center justify-center px-8 py-4 bg-purple-600 text-white rounded-2xl font-bold hover:bg-purple-700 transition-all">
+            Voltar para a home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const totalVisits = invitations.reduce((acc: number, inv: any) => acc + 0, 0); // Need to implement visits tracking later
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -42,7 +65,7 @@ export default async function Dashboard() {
       <aside className="w-80 bg-white border-r border-slate-100 hidden lg:flex flex-col p-8 fixed h-full z-40">
         <div className="flex items-center gap-2 mb-12">
            <span className="text-2xl">✨</span>
-           <span className="font-bold text-xl">Convite<span className="text-purple-600">Online</span></span>
+           <span className="font-bold text-xl">Delicatta</span>
         </div>
 
         <nav className="flex-1 space-y-2">

@@ -18,7 +18,7 @@ export default function Home() {
         <nav className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-2xl">✨</span>
-            <span className="font-bold text-xl tracking-tight">Convite<span className="text-purple-600">Online</span></span>
+            <span className="font-bold text-xl tracking-tight">Delicatta</span>
           </div>
           
           <div className="hidden md:flex items-center gap-8">
@@ -132,8 +132,8 @@ export default function Home() {
 
       <footer className="py-12 border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="font-bold text-xl">Convite<span className="text-purple-600">Online</span></div>
-          <p className="text-slate-400 text-sm">© 2026 Convite Online. Criado com ❤️ para momentos especiais.</p>
+          <div className="font-bold text-xl">Delicatta</div>
+          <p className="text-slate-400 text-sm">© 2026 Delicatta. Criado com ❤️ para momentos especiais.</p>
           <div className="flex gap-6 text-slate-400">
             <a href="#" className="hover:text-purple-600 transition-colors">Privacidade</a>
             <a href="#" className="hover:text-purple-600 transition-colors">Termos</a>

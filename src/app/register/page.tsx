@@ -49,7 +49,7 @@ export default function Register() {
         <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
              <span className="text-3xl">✨</span>
-             <span className="font-bold text-2xl">Convite<span className="text-purple-600">Online</span></span>
+             <span className="font-bold text-2xl">Delicatta</span>
           </div>
           <h2 className="text-3xl font-playfair font-bold text-slate-800">Criar Sua Conta</h2>
           <p className="text-slate-500 mt-2">Comece a encantar seus convidados hoje.</p>
