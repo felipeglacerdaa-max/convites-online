@@ -4,11 +4,11 @@ import { Sparkles, Music, Camera, Heart, ChevronRight, Settings } from 'lucide-r
 
 export default function Home() {
   const templates = [
-    { id: '1', name: 'Elegance Wedding', category: 'Casamento', img: '/assets/img/template_casamento.png', desc: 'Minimalista e sofisticado.' },
-    { id: '2', name: 'Celebration Party', category: 'Aniversário', img: '/assets/img/template_aniversario.png', desc: 'Vibrante e moderno.' },
-    { id: '3', name: 'Angelic Baptism', category: 'Batizado', img: '/assets/img/template_batizado.png', desc: 'Suave e celestial.' },
-    { id: '4', name: 'Victory Graduation', category: 'Formatura', img: '/assets/img/template_formatura.png', desc: 'Acadêmico e prestigioso.' },
-    { id: '5', name: 'Princess Debut', category: '15 Anos', img: '/assets/img/template_15anos.png', desc: 'Luxuoso e rosa gold.' },
+    { id: '1', name: 'Casamento Elegante', category: 'Casamento', img: '/assets/img/template_casamento.png', desc: 'Minimalista e sofisticado.' },
+    { id: '2', name: 'Celebração Vibrante', category: 'Aniversário', img: '/assets/img/template_aniversario.png', desc: 'Vibrante e moderno.' },
+    { id: '3', name: 'Batizado Angelical', category: 'Batizado', img: '/assets/img/template_batizado.png', desc: 'Suave e celestial.' },
+    { id: '4', name: 'Formatura Triunfal', category: 'Formatura', img: '/assets/img/template_formatura.png', desc: 'Acadêmico e prestigioso.' },
+    { id: '5', name: '15 Anos Luxo', category: '15 Anos', img: '/assets/img/template_15anos.png', desc: 'Luxuoso e rosa gold.' },
   ];
 
   return (
