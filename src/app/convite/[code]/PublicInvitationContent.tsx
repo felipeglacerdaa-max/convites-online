@@ -1,13 +1,18 @@
 'use client';
 
-import { useState } from 'react';
-import { Music, MapPin, Calendar, Clock, Video, Heart, Share2, Check, Plus, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Music, MapPin, Calendar, Clock, Video, Heart, Share2, Check, Plus, Loader2, Sparkles } from 'lucide-react';
 
 export default function PublicInvitationContent({ invitation }: { invitation: any }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [rsvpSent, setRsvpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rsvpName, setRsvpName] = useState('');
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
 
   const toggleMusic = () => setIsPlaying(!isPlaying);
 
@@ -31,140 +36,190 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-purple-100 overflow-x-hidden">
-      {/* Background Decor */}
-      <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0 opacity-10">
-        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-600 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600 rounded-full blur-[120px]"></div>
+    <div className="min-h-screen bg-[#faf9f6] text-slate-800 font-sans selection:bg-rose-100 overflow-x-hidden pb-20">
+      {/* Premium Background Pattern */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03]" 
+           style={{ backgroundImage: `url('https://www.transparenttextures.com/patterns/cream-paper.png')` }}>
       </div>
 
-      <main className="relative z-10 max-w-2xl mx-auto px-6 py-12 space-y-12 pb-32">
-        {/* Floating Music Toggle */}
+      <main className={`relative z-10 max-w-lg mx-auto px-4 py-12 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        
+        {/* Floating Music Button (Refined) */}
         {invitation.musicUrl && (
           <button 
             onClick={toggleMusic}
-            className={`fixed top-6 right-6 p-4 rounded-full shadow-2xl transition-all duration-500 z-50 ${isPlaying ? 'bg-purple-600 text-white animate-spin-slow' : 'bg-white text-slate-400'} animate-float`}
+            className={`fixed top-6 right-6 p-3 rounded-full shadow-lg transition-all duration-700 z-50 ${isPlaying ? 'bg-rose-500 text-white scan-pulse' : 'bg-white/80 backdrop-blur-md text-slate-400 border border-slate-100'}`}
           >
-            <Music size={24} />
+            <Music size={20} className={isPlaying ? 'animate-spin-slow' : ''} />
           </button>
         )}
 
-        {/* Hero Section */}
-        <section className="relative rounded-[3rem] overflow-hidden shadow-2xl shadow-purple-600/10 aspect-[3/4] group animate-scale-in">
-          <img src={invitation.imageUrl || '/assets/img/template_casamento.png'} alt={invitation.title} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-1000" />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
-          <div className="absolute bottom-12 left-10 right-10 text-white space-y-2 translate-y-4 opacity-0 animate-fade-in-up delay-300">
-            <span className="text-xs font-bold uppercase tracking-[0.3em] opacity-80">
-              Você está convidado para
-            </span>
-            <h1 className="text-4xl md:text-5xl font-playfair font-bold">{invitation.title}</h1>
-          </div>
-        </section>
-
-        {/* Information Section */}
-        <section className="bg-white p-10 rounded-[3rem] shadow-xl shadow-slate-200/50 border border-slate-50 space-y-10 text-center opacity-0 animate-fade-in-up delay-100">
-          <div className="space-y-4">
-             <Heart className="mx-auto text-rose-500 animate-pulse" size={32} />
-             <p className="font-playfair italic text-xl text-slate-600 leading-relaxed max-w-md mx-auto">
-                "{invitation.message}"
-             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-slate-50">
-             <div className="space-y-4">
-                <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mx-auto hover:scale-110 transition-transform">
-                    <Calendar size={24} />
-                </div>
-                <div>
-                   <h4 className="font-bold text-slate-800 uppercase tracking-widest text-xs mb-1">Data & Hora</h4>
-                   <p className="font-semibold text-slate-500">{invitation.date}</p>
-                   <p className="font-semibold text-slate-500">{invitation.time}</p>
-                </div>
-             </div>
-             <div className="space-y-4">
-                <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto hover:scale-110 transition-transform">
-                    <MapPin size={24} />
-                </div>
-                <div>
-                   <h4 className="font-bold text-slate-800 uppercase tracking-widest text-xs mb-1">Localização</h4>
-                   <p className="font-semibold text-slate-500 leading-tight">{invitation.location}</p>
-                </div>
-             </div>
-          </div>
-
-          <button className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 mx-auto hover:bg-purple-600 transition-all shadow-xl shadow-slate-900/20 active:scale-95">
-             <MapPin size={18} /> Ver no Mapa
-          </button>
-        </section>
-
-        {/* Video Side (If URL exists) */}
-        {invitation.videoUrl && (
-          <section className="bg-white p-6 rounded-[3rem] shadow-xl border border-slate-50 overflow-hidden opacity-0 animate-fade-in-up delay-200">
-             <div className="aspect-video w-full bg-slate-100 rounded-2xl flex items-center justify-center relative overflow-hidden group">
-                <Video size={48} className="text-slate-300 group-hover:scale-110 transition-transform" />
-                <div className="absolute bottom-4 left-4 right-4 bg-white/20 backdrop-blur-md px-4 py-2 rounded-xl text-white text-xs font-bold tracking-widest">ASSISTIR VÍDEO COMPLETO</div>
-             </div>
-          </section>
-        )}
-
-        {/* RSVP Section */}
-        <section id="rsvp" className="bg-purple-600 p-12 rounded-[3.5rem] shadow-2xl shadow-purple-600/30 text-white text-center opacity-0 animate-fade-in-up delay-300">
-            <h2 className="text-3xl font-playfair font-bold mb-4">Confirmar Presença</h2>
-            <p className="opacity-80 mb-10 text-sm max-w-xs mx-auto">Sua presença é fundamental para tornar este dia ainda mais especial.</p>
+        {/* Invitation Card Container */}
+        <div className="bg-white p-2 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-slate-100 relative overflow-hidden">
+          
+          {/* Internal Decorative Border */}
+          <div className="border border-rose-100 rounded-[2rem] p-6 md:p-10 relative">
             
-            {!rsvpSent ? (
-               <form className="space-y-4" onSubmit={handleRsvp}>
-                  <input 
-                    type="text" 
-                    required 
-                    value={rsvpName}
-                    onChange={(e) => setRsvpName(e.target.value)}
-                    placeholder="Seu Nome Completo" 
-                    className="w-full bg-white/10 border border-white/20 rounded-2xl p-5 outline-none focus:bg-white/20 transition-all placeholder:text-white/50 font-semibold" 
-                  />
-                  <button 
-                    disabled={loading}
-                    className="w-full bg-white text-purple-600 font-bold py-5 rounded-2xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                  >
-                    {loading ? <Loader2 className="animate-spin" /> : 'Confirmar Agora'}
-                  </button>
-               </form>
-            ) : (
-               <div className="bg-white/10 p-10 rounded-3xl flex flex-col items-center gap-4">
-                  <div className="w-16 h-16 bg-white text-purple-600 rounded-full flex items-center justify-center shadow-lg animate-bounce">
-                    <Check size={32} strokeWidth={3} />
-                  </div>
-                  <h3 className="text-xl font-bold">Confirmado!</h3>
-                  <p className="text-sm opacity-80">Obrigado por confirmar sua presença.</p>
+            {/* Header / Hero */}
+            <header className="text-center space-y-6 mb-12">
+               <div className="flex justify-center mb-4">
+                  <div className="w-16 h-1px bg-rose-200 self-center"></div>
+                  <Sparkles className="mx-4 text-rose-300" size={24} />
+                  <div className="w-16 h-1px bg-rose-200 self-center"></div>
                </div>
-            )}
-        </section>
+               
+               <div className="space-y-2">
+                 <p className="text-[10px] uppercase tracking-[0.4em] text-rose-400 font-bold">Você foi convidado</p>
+                 <h1 className="text-4xl md:text-5xl font-playfair font-bold text-slate-800 leading-tight">
+                    {invitation.title}
+                 </h1>
+               </div>
 
-        {/* Share Button (Sticky Bottom) */}
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 z-40 bg-white/80 backdrop-blur-xl border border-slate-100 px-8 py-4 rounded-3xl shadow-2xl opacity-0 animate-fade-in-up delay-500">
+               {invitation.imageUrl && (
+                 <div className="relative mt-8 group">
+                   <div className="absolute -inset-1 bg-gradient-to-r from-rose-100 to-indigo-100 rounded-3xl blur opacity-25"></div>
+                   <div className="relative aspect-[4/5] rounded-3xl overflow-hidden border-4 border-white shadow-inner">
+                      <img 
+                        src={invitation.imageUrl} 
+                        alt={invitation.title} 
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+                      />
+                   </div>
+                 </div>
+               )}
+            </header>
+
+            {/* Message */}
+            <div className="text-center mb-12 relative">
+               <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-5xl text-rose-50 font-serif">"</span>
+               <p className="font-playfair italic text-xl text-slate-600 leading-relaxed px-4">
+                  {invitation.message}
+               </p>
+               <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-5xl text-rose-50 font-serif transform rotate-180">"</span>
+            </div>
+
+            {/* Details Grid */}
+            <div className="grid grid-cols-1 gap-10 pt-10 border-t border-slate-50 mb-12">
+               <div className="flex flex-col items-center text-center space-y-3">
+                  <Calendar className="text-rose-400" size={28} strokeWidth={1.5} />
+                  <div>
+                    <h4 className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-1">Quando</h4>
+                    <p className="font-playfair font-bold text-xl text-slate-700">{invitation.date}</p>
+                    <div className="flex items-center justify-center gap-2 text-slate-500 font-medium">
+                      <Clock size={14} /> <span>às {invitation.time}</span>
+                    </div>
+                  </div>
+               </div>
+
+               <div className="flex flex-col items-center text-center space-y-3">
+                  <MapPin className="text-rose-400" size={28} strokeWidth={1.5} />
+                  <div>
+                    <h4 className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-1">Onde</h4>
+                    <p className="font-playfair font-bold text-xl text-slate-700 max-w-[200px] leading-tight">
+                      {invitation.location}
+                    </p>
+                  </div>
+                  <button className="text-xs font-bold text-rose-500 hover:text-rose-600 transition-colors underline decoration-rose-200 underline-offset-4">
+                    Ver localização no mapa
+                  </button>
+               </div>
+            </div>
+
+            {/* Video Preview (If exists) */}
+            {invitation.videoUrl && (
+              <div className="mb-12">
+                <div className="aspect-video rounded-3xl overflow-hidden bg-slate-50 border border-slate-100 flex items-center justify-center group cursor-pointer relative">
+                   <Video size={40} className="text-rose-200 group-hover:scale-110 transition-transform" />
+                   <div className="absolute inset-0 bg-rose-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                   <div className="absolute bottom-4 text-[10px] font-bold tracking-[0.2em] text-rose-400 opacity-60 uppercase">Assista nossa história</div>
+                </div>
+              </div>
+            )}
+
+            {/* RSVP Form */}
+            <div id="rsvp" className="mt-12 pt-12 border-t border-slate-50 relative">
+               {!rsvpSent ? (
+                 <div className="space-y-8">
+                    <div className="text-center">
+                      <Heart className="mx-auto text-rose-200 mb-4" size={32} />
+                      <h3 className="text-2xl font-playfair font-bold text-slate-800">Confirmar Presença</h3>
+                      <p className="text-slate-400 text-sm mt-1">Gostaríamos muito de contar com você.</p>
+                    </div>
+
+                    <form className="space-y-4" onSubmit={handleRsvp}>
+                      <div className="relative">
+                        <input 
+                          type="text" 
+                          required 
+                          value={rsvpName}
+                          onChange={(e) => setRsvpName(e.target.value)}
+                          placeholder="Seu Nome Completo" 
+                          className="w-full bg-slate-50 border-0 rounded-2xl p-5 text-center outline-none focus:ring-2 focus:ring-rose-200 transition-all font-semibold text-slate-700 placeholder:text-slate-300" 
+                        />
+                      </div>
+                      <button 
+                        disabled={loading}
+                        className="w-full bg-rose-500 text-white font-bold py-5 rounded-2xl shadow-xl shadow-rose-500/20 hover:bg-rose-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2 uppercase tracking-widest text-xs"
+                      >
+                        {loading ? <Loader2 className="animate-spin" size={18} /> : 'Confirmar Presença'}
+                      </button>
+                    </form>
+                 </div>
+               ) : (
+                 <div className="py-8 text-center animate-in fade-in zoom-in duration-500">
+                    <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <Check size={40} strokeWidth={3} />
+                    </div>
+                    <h3 className="text-2xl font-playfair font-bold text-slate-800">Presença Confirmada!</h3>
+                    <p className="text-slate-500 mt-2">Estamos muito felizes que você virá.</p>
+                 </div>
+               )}
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons (Sticky at bottom, but refined) */}
+        <div className="mt-12 flex items-center justify-center gap-6">
            <button 
              onClick={() => {
                if (navigator.share) {
-                 navigator.share({
-                   title: invitation.title,
-                   text: invitation.message,
-                   url: window.location.href,
-                 })
+                 navigator.share({ title: invitation.title, text: invitation.message, url: window.location.href })
                } else {
                  navigator.clipboard.writeText(window.location.href);
-                 alert('Link copiado para a área de transferência!');
+                 alert('Link copiado!');
                }
              }}
-             className="flex items-center gap-2 font-bold text-slate-800 text-sm hover:text-purple-600 transition-colors"
+             className="flex items-center gap-2 font-bold text-slate-400 text-[10px] uppercase tracking-widest hover:text-rose-500 transition-colors"
            >
-              <Share2 size={18} className="text-purple-600" /> Compartilhar
+              <Share2 size={16} /> Compartilhar
            </button>
-           <div className="w-[1px] h-6 bg-slate-200"></div>
-           <button className="flex items-center gap-2 font-bold text-slate-800 text-sm hover:text-purple-600 transition-colors">
-              <Plus size={18} className="text-indigo-600" /> Salvar Evento
+           <div className="w-[1px] h-4 bg-slate-200"></div>
+           <button className="flex items-center gap-2 font-bold text-slate-400 text-[10px] uppercase tracking-widest hover:text-rose-500 transition-colors">
+              <Plus size={16} /> Salvar Evento
            </button>
         </div>
+
+        <footer className="mt-20 text-center opacity-30">
+           <div className="text-[10px] font-bold uppercase tracking-[0.5em] text-slate-400">Delicatta Premium</div>
+        </footer>
       </main>
+
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;700&display=swap');
+        
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .font-sans { font-family: 'Inter', sans-serif; }
+
+        @keyframes scan-pulse {
+          0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+          70% { box-shadow: 0 0 0 15px rgba(244, 63, 94, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+        }
+        .scan-pulse { animation: scan-pulse 2s infinite; }
+        .animate-spin-slow { animation: spin 8s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      `}</style>
     </div>
   );
 }
+
