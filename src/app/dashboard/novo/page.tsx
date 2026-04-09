@@ -27,6 +27,8 @@ export default function NewInvitation() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [createdCode, setCreatedCode] = useState('');
 
   useEffect(() => {
     const checkUser = async () => {
@@ -68,7 +70,8 @@ export default function NewInvitation() {
       const data = await res.json();
 
       if (res.ok) {
-        router.push(`/dashboard?created=true`);
+        setCreatedCode(data.code);
+        setSuccess(true);
       } else {
         setError(data.message || 'Erro ao criar convite.');
       }
@@ -80,7 +83,45 @@ export default function NewInvitation() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row h-screen overflow-hidden">
+    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row h-screen overflow-hidden relative">
+      {/* Success Modal */}
+      {success && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6 animate-in fade-in duration-300">
+           <div className="bg-white rounded-[3rem] p-10 max-w-lg w-full shadow-2xl text-center space-y-6 animate-scale-in">
+              <div className="w-20 h-20 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                <Sparkles size={40} />
+              </div>
+              <h2 className="text-3xl font-playfair font-bold text-slate-900">Convite Criado!</h2>
+              <p className="text-slate-500">Seu convite já está online e pronto para ser compartilhado.</p>
+              
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between gap-4">
+                 <code className="text-sm font-bold text-purple-600 truncate">
+                   {typeof window !== 'undefined' ? `${window.location.origin}/convite=${createdCode}` : ''}
+                 </code>
+                 <button 
+                  onClick={() => {
+                    const url = `${window.location.origin}/convite=${createdCode}`;
+                    navigator.clipboard.writeText(url);
+                    alert('Copiado!');
+                  }}
+                  className="bg-white p-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition-all text-slate-400"
+                 >
+                   <Save size={18} />
+                 </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Link href="/dashboard" className="py-4 bg-slate-100 text-slate-700 rounded-2xl font-bold hover:bg-slate-200 transition-all">
+                  Ir para Painel
+                </Link>
+                <Link href={`/convite=${createdCode}`} className="py-4 bg-purple-600 text-white rounded-2xl font-bold hover:bg-purple-700 transition-all shadow-xl shadow-purple-600/20">
+                  Ver Online
+                </Link>
+              </div>
+           </div>
+        </div>
+      )}
+
       {/* Form Side */}
       <div className="w-full md:w-[600px] bg-white h-full overflow-y-auto p-8 border-r border-slate-100 custom-scrollbar">
         <div className="max-w-xl mx-auto">

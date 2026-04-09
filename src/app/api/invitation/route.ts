@@ -14,22 +14,17 @@ export async function POST(req: Request) {
     const data = await req.json();
     const { title, date, time, location, message, imageUrl, videoUrl, musicUrl, template } = data;
 
-    // Generate a unique code
-    const baseCode = title
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/[\s_-]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-    
-    let code = baseCode || "convite";
+    // Generate a unique random code (6 digits)
+    const generateRandomCode = () => {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    };
+
+    let code = generateRandomCode();
     let slugExists = await prisma.invitation.findUnique({ where: { code } });
-    let counter = 1;
 
     while (slugExists) {
-      code = `${baseCode}-${counter}`;
+      code = generateRandomCode();
       slugExists = await prisma.invitation.findUnique({ where: { code } });
-      counter++;
     }
 
     const invitation = await prisma.invitation.create({

@@ -43,17 +43,17 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
         {invitation.musicUrl && (
           <button 
             onClick={toggleMusic}
-            className={`fixed top-6 right-6 p-4 rounded-full shadow-2xl transition-all duration-500 z-50 ${isPlaying ? 'bg-purple-600 text-white animate-spin-slow' : 'bg-white text-slate-400'}`}
+            className={`fixed top-6 right-6 p-4 rounded-full shadow-2xl transition-all duration-500 z-50 ${isPlaying ? 'bg-purple-600 text-white animate-spin-slow' : 'bg-white text-slate-400'} animate-float`}
           >
             <Music size={24} />
           </button>
         )}
 
         {/* Hero Section */}
-        <section className="relative rounded-[3rem] overflow-hidden shadow-2xl shadow-purple-600/10 aspect-[3/4] group">
+        <section className="relative rounded-[3rem] overflow-hidden shadow-2xl shadow-purple-600/10 aspect-[3/4] group animate-scale-in">
           <img src={invitation.imageUrl || '/assets/img/template_casamento.png'} alt={invitation.title} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-1000" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
-          <div className="absolute bottom-12 left-10 right-10 text-white space-y-2">
+          <div className="absolute bottom-12 left-10 right-10 text-white space-y-2 translate-y-4 opacity-0 animate-fade-in-up delay-300">
             <span className="text-xs font-bold uppercase tracking-[0.3em] opacity-80">
               Você está convidado para
             </span>
@@ -62,9 +62,9 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
         </section>
 
         {/* Information Section */}
-        <section className="bg-white p-10 rounded-[3rem] shadow-xl shadow-slate-200/50 border border-slate-50 space-y-10 text-center">
+        <section className="bg-white p-10 rounded-[3rem] shadow-xl shadow-slate-200/50 border border-slate-50 space-y-10 text-center opacity-0 animate-fade-in-up delay-100">
           <div className="space-y-4">
-             <Heart className="mx-auto text-rose-500" size={32} />
+             <Heart className="mx-auto text-rose-500 animate-pulse" size={32} />
              <p className="font-playfair italic text-xl text-slate-600 leading-relaxed max-w-md mx-auto">
                 "{invitation.message}"
              </p>
@@ -72,7 +72,7 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-slate-50">
              <div className="space-y-4">
-                <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mx-auto">
+                <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mx-auto hover:scale-110 transition-transform">
                     <Calendar size={24} />
                 </div>
                 <div>
@@ -82,7 +82,7 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
                 </div>
              </div>
              <div className="space-y-4">
-                <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto">
+                <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto hover:scale-110 transition-transform">
                     <MapPin size={24} />
                 </div>
                 <div>
@@ -99,7 +99,7 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
 
         {/* Video Side (If URL exists) */}
         {invitation.videoUrl && (
-          <section className="bg-white p-6 rounded-[3rem] shadow-xl border border-slate-50 overflow-hidden">
+          <section className="bg-white p-6 rounded-[3rem] shadow-xl border border-slate-50 overflow-hidden opacity-0 animate-fade-in-up delay-200">
              <div className="aspect-video w-full bg-slate-100 rounded-2xl flex items-center justify-center relative overflow-hidden group">
                 <Video size={48} className="text-slate-300 group-hover:scale-110 transition-transform" />
                 <div className="absolute bottom-4 left-4 right-4 bg-white/20 backdrop-blur-md px-4 py-2 rounded-xl text-white text-xs font-bold tracking-widest">ASSISTIR VÍDEO COMPLETO</div>
@@ -108,7 +108,7 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
         )}
 
         {/* RSVP Section */}
-        <section id="rsvp" className="bg-purple-600 p-12 rounded-[3.5rem] shadow-2xl shadow-purple-600/30 text-white text-center">
+        <section id="rsvp" className="bg-purple-600 p-12 rounded-[3.5rem] shadow-2xl shadow-purple-600/30 text-white text-center opacity-0 animate-fade-in-up delay-300">
             <h2 className="text-3xl font-playfair font-bold mb-4">Confirmar Presença</h2>
             <p className="opacity-80 mb-10 text-sm max-w-xs mx-auto">Sua presença é fundamental para tornar este dia ainda mais especial.</p>
             
@@ -131,7 +131,7 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
                </form>
             ) : (
                <div className="bg-white/10 p-10 rounded-3xl flex flex-col items-center gap-4">
-                  <div className="w-16 h-16 bg-white text-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                  <div className="w-16 h-16 bg-white text-purple-600 rounded-full flex items-center justify-center shadow-lg animate-bounce">
                     <Check size={32} strokeWidth={3} />
                   </div>
                   <h3 className="text-xl font-bold">Confirmado!</h3>
@@ -141,8 +141,22 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
         </section>
 
         {/* Share Button (Sticky Bottom) */}
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 z-40 bg-white/80 backdrop-blur-xl border border-slate-100 px-8 py-4 rounded-3xl shadow-2xl">
-           <button className="flex items-center gap-2 font-bold text-slate-800 text-sm hover:text-purple-600 transition-colors">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 z-40 bg-white/80 backdrop-blur-xl border border-slate-100 px-8 py-4 rounded-3xl shadow-2xl opacity-0 animate-fade-in-up delay-500">
+           <button 
+             onClick={() => {
+               if (navigator.share) {
+                 navigator.share({
+                   title: invitation.title,
+                   text: invitation.message,
+                   url: window.location.href,
+                 })
+               } else {
+                 navigator.clipboard.writeText(window.location.href);
+                 alert('Link copiado para a área de transferência!');
+               }
+             }}
+             className="flex items-center gap-2 font-bold text-slate-800 text-sm hover:text-purple-600 transition-colors"
+           >
               <Share2 size={18} className="text-purple-600" /> Compartilhar
            </button>
            <div className="w-[1px] h-6 bg-slate-200"></div>
