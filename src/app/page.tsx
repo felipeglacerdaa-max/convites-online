@@ -48,9 +48,6 @@ export default function Home() {
                 <Link href="#templates" className="bg-purple-600 text-white px-8 py-4 rounded-full font-bold text-lg shadow-xl shadow-purple-600/20 hover:scale-105 transition-all">
                   Ver Modelos
                 </Link>
-                <Link href="/login" className="bg-slate-100 text-slate-700 px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-200 transition-all">
-                  Começar Agora
-                </Link>
               </div>
             </div>
 
