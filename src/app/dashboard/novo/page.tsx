@@ -96,11 +96,11 @@ export default function NewInvitation() {
               
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between gap-4">
                  <code className="text-sm font-bold text-purple-600 truncate">
-                   {typeof window !== 'undefined' ? `${window.location.origin}/convite=${createdCode}` : ''}
+                   {typeof window !== 'undefined' ? `${window.location.origin}/convite/${createdCode}` : ''}
                  </code>
                  <button 
                   onClick={() => {
-                    const url = `${window.location.origin}/convite=${createdCode}`;
+                    const url = `${window.location.origin}/convite/${createdCode}`;
                     navigator.clipboard.writeText(url);
                     alert('Copiado!');
                   }}
@@ -114,7 +114,7 @@ export default function NewInvitation() {
                 <Link href="/dashboard" className="py-4 bg-slate-100 text-slate-700 rounded-2xl font-bold hover:bg-slate-200 transition-all">
                   Ir para Painel
                 </Link>
-                <Link href={`/convite=${createdCode}`} className="py-4 bg-purple-600 text-white rounded-2xl font-bold hover:bg-purple-700 transition-all shadow-xl shadow-purple-600/20">
+                <Link href={`/convite/${createdCode}`} className="py-4 bg-purple-600 text-white rounded-2xl font-bold hover:bg-purple-700 transition-all shadow-xl shadow-purple-600/20">
                   Ver Online
                 </Link>
               </div>

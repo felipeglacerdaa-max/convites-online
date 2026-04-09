@@ -131,7 +131,7 @@ export default async function Dashboard() {
                 </div>
 
                 <div className="mt-6 flex flex-wrap gap-3">
-                  <Link href={`/convite=${inv.code}`} className="flex-1 bg-slate-100 text-slate-700 font-bold py-3 px-4 rounded-xl text-center text-sm hover:bg-slate-200 transition-all flex items-center justify-center gap-2">
+                  <Link href={`/convite/${inv.code}`} className="flex-1 bg-slate-100 text-slate-700 font-bold py-3 px-4 rounded-xl text-center text-sm hover:bg-slate-200 transition-all flex items-center justify-center gap-2">
                     <ExternalLink size={16} /> Ver Online
                   </Link>
                   <Link href={`/dashboard/editar/${inv.id}`} className="flex-1 bg-purple-100 text-purple-600 font-bold py-3 px-4 rounded-xl text-center text-sm hover:bg-purple-600 hover:text-white transition-all">
