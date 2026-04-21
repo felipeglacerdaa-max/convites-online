@@ -19,22 +19,28 @@ model User {
 }
 
 model Invitation {
-  id          String   @id @default(uuid())
-  title       String
-  date        String
-  time        String
-  location    String
-  message     String
-  imageUrl    String?
-  videoUrl    String?
-  musicUrl    String?
-  template    String   @default("1")
-  code        String   @unique // Short code for the URL /convite/code
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  rsvps       RSVP[]
+  id            String   @id @default(uuid())
+  title         String
+  date          String
+  time          String
+  location      String
+  message       String
+  imageUrl      String?
+  videoUrl      String?
+  musicUrl      String?
+  backgroundUrl  String?
+  backgroundLocal String?
+  backgroundType String   @default("image") // "image" or "video"
+  template      String   @default("1")
+  code          String   @unique // Short code for the URL /convite/code
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  adminEmail    String
+  adminPassword String   // Hashed password
+  adminCode     String   @unique // Unique code for admin access
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  rsvps         RSVP[]
 }
 
 model RSVP {

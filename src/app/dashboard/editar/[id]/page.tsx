@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import {
   ArrowLeft,
   Save,
@@ -37,28 +37,20 @@ type FormState = {
   template: string;
 };
 
-type CreateInvitationResponse = {
-  message?: string;
-  code?: string;
-  adminCode?: string;
-  adminEmail?: string;
-};
-
-export default function NewInvitation() {
+export default function EditInvitation({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [createdCode, setCreatedCode] = useState('');
-  const [createdAdminCode, setCreatedAdminCode] = useState('');
-  const [createdAdminEmail, setCreatedAdminEmail] = useState('');
   const [formData, setFormData] = useState<FormState>({
-    title: 'Meu Evento Especial',
-    date: '2026-06-15',
-    time: '19:00',
-    location: 'Endereço do Evento',
-    message: 'Esperamos você para comemorar conosco esse momento inesquecível!',
+    title: '',
+    date: '',
+    time: '',
+    location: '',
+    message: '',
     imageUrl: '',
     imageLocal: '',
     videoUrl: '',
@@ -72,21 +64,32 @@ export default function NewInvitation() {
   });
 
   useEffect(() => {
-    const checkUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
+    const init = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.push('/login');
         return;
       }
-
       setLoadingAuth(false);
-    };
 
-    void checkUser();
-  }, [router]);
+      try {
+        const res = await fetch(`/api/invitation?id=${id}`);
+        if (!res.ok) throw new Error('Não foi possível carregar o convite');
+        const data = await res.json();
+        setFormData({
+          ...data,
+          adminPassword: '', // Don't show password
+          imageLocal: '', // Reset local previews
+          backgroundLocal: '',
+        });
+      } catch (err) {
+        setError('Erro ao carregar dados do convite');
+      } finally {
+        setFetching(false);
+      }
+    };
+    init();
+  }, [id, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -110,23 +113,20 @@ export default function NewInvitation() {
     setError('');
 
     try {
-      const res = await fetch('/api/invitation', {
-        method: 'POST',
+      const res = await fetch(`/api/invitation?id=${id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      const data = (await res.json()) as CreateInvitationResponse;
-
       if (!res.ok) {
-        setError(data.message || 'Erro ao criar convite.');
+        const data = await res.json();
+        setError(data.message || 'Erro ao atualizar convite.');
         return;
       }
 
-      setCreatedCode(data.code ?? '');
-      setCreatedAdminCode(data.adminCode ?? '');
-      setCreatedAdminEmail(data.adminEmail ?? '');
       setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
     } catch {
       setError('Algo deu errado. Tente novamente.');
     } finally {
@@ -134,7 +134,7 @@ export default function NewInvitation() {
     }
   };
 
-  if (loadingAuth) {
+  if (loadingAuth || fetching) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <Loader2 className="animate-spin text-purple-600 w-10 h-10" />
@@ -144,69 +144,26 @@ export default function NewInvitation() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row h-screen overflow-hidden relative">
-      {success && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
-          <div className="bg-white rounded-[3rem] p-10 max-w-lg w-full shadow-2xl text-center space-y-6">
-            <div className="w-20 h-20 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto">
-              <Sparkles size={40} />
-            </div>
-            <h2 className="text-3xl font-playfair font-bold text-slate-900">Convite Criado!</h2>
-            <p className="text-slate-500">Seu convite já está online e pronto para ser compartilhado.</p>
-
-            <div className="space-y-4">
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-left space-y-2">
-                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Link Público (para compartilhar)</p>
-                <code className="text-sm font-bold text-purple-600 break-all bg-white px-3 py-2 rounded-lg border border-slate-200 block w-full mt-1">
-                  {typeof window !== 'undefined' ? `${window.location.origin}/convite/${createdCode}` : ''}
-                </code>
-              </div>
-
-              <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100 text-left space-y-2">
-                <p className="text-xs font-bold uppercase tracking-widest text-purple-400">Link Administrativo (para o cliente)</p>
-                <code className="text-sm font-bold text-indigo-600 break-all bg-white px-3 py-2 rounded-lg border border-indigo-200 block w-full mt-1">
-                  {typeof window !== 'undefined' ? `${window.location.origin}/gerenciar/${createdAdminCode}` : ''}
-                </code>
-                <div className="text-[10px] text-slate-500 mt-2 p-2 bg-white/50 rounded-lg">
-                  <p><strong>E-mail:</strong> {createdAdminEmail}</p>
-                  <p><strong>Senha:</strong> A que você definiu no formulário</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
-              <Link href="/dashboard" className="py-4 bg-slate-100 text-slate-700 rounded-2xl font-bold hover:bg-slate-200 transition-all text-center text-sm">
-                Voltar ao Painel
-              </Link>
-              <Link href={`/convite/${createdCode}`} className="py-4 bg-purple-100 text-purple-700 rounded-2xl font-bold hover:bg-purple-200 transition-all text-center text-sm">
-                Ver Convite
-              </Link>
-              <Link href={`/gerenciar/${createdAdminCode}`} className="py-4 bg-purple-600 text-white rounded-2xl font-bold hover:bg-purple-700 transition-all text-center text-sm shadow-lg shadow-purple-600/30">
-                Gerenciar Agora
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="w-full md:w-[600px] bg-white h-full overflow-y-auto p-8 border-r border-slate-100">
         <div className="max-w-xl mx-auto">
-          <Link href="/dashboard" className="flex items-center gap-2 text-slate-400 hover:text-purple-600 transition-colors mb-8 font-semibold">
+          <Link href="/dashboard/admin" className="flex items-center gap-2 text-slate-400 hover:text-purple-600 transition-colors mb-8 font-semibold">
             <ArrowLeft size={18} /> Voltar ao Painel
           </Link>
 
           <header className="mb-10">
-            <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-playfair font-bold text-slate-800">Novo Convite</h1>
-              <div className="bg-purple-100 text-purple-600 p-3 rounded-2xl">
-                <Plus size={24} />
-              </div>
-            </div>
-            <p className="text-slate-500 mt-2">Preencha os dados abaixo e veja a prévia em tempo real.</p>
+            <h1 className="text-3xl font-playfair font-bold text-slate-800">Editar Convite</h1>
+            <p className="text-slate-500 mt-2">Atualize as informações do seu convite.</p>
           </header>
 
           {error && (
             <div className="bg-rose-50 text-rose-600 p-4 rounded-xl text-sm font-medium border border-rose-100 mb-8">
               {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-emerald-50 text-emerald-600 p-4 rounded-xl text-sm font-medium border border-emerald-100 mb-8 flex items-center gap-2">
+              <Sparkles size={16} /> Convite atualizado com sucesso!
             </div>
           )}
 
@@ -216,7 +173,7 @@ export default function NewInvitation() {
 
               <div className="space-y-1.5">
                 <label className="text-sm font-semibold text-slate-700">Título do Evento</label>
-                <input name="title" value={formData.title} onChange={handleChange} required className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all" />
+                <input name="title" value={formData.title} onChange={handleChange} required className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all font-bold" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -248,7 +205,7 @@ export default function NewInvitation() {
                    <div className="flex items-center gap-3">
                     <input name="imageUrl" placeholder="Link da imagem (opcional)" value={formData.imageUrl} onChange={handleChange} className="flex-1 px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-purple-600 transition-all text-sm" />
                     <span className="text-slate-300 font-bold uppercase text-[10px]">ou</span>
-                    <label className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:shadow-lg hover:shadow-purple-600/20 transition-all cursor-pointer flex items-center gap-2 text-xs font-bold">
+                    <label className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all cursor-pointer flex items-center gap-2 text-xs font-bold">
                       <Plus size={14} /> Local
                       <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'imageLocal')} className="hidden" />
                     </label>
@@ -282,7 +239,7 @@ export default function NewInvitation() {
                   <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                     <Sparkles size={16} className="text-amber-600" /> Fundo Animado
                   </label>
-                  <p className="text-xs text-slate-500 mt-1">Deixe seu convite mais elegante com um fundo único</p>
+                  <p className="text-xs text-slate-500 mt-1">Imagem ou vídeo de fundo para o convite</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-xl">
@@ -327,87 +284,48 @@ export default function NewInvitation() {
                   <input name="adminEmail" type="email" value={formData.adminEmail} onChange={handleChange} required className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700">Senha administrativa</label>
-                  <input name="adminPassword" type="password" value={formData.adminPassword} onChange={handleChange} required className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all" />
+                  <label className="text-sm font-semibold text-slate-700">Senha (deixe em branco se não quiser mudar)</label>
+                  <input name="adminPassword" type="password" value={formData.adminPassword} onChange={handleChange} className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-600 transition-all" />
                 </div>
               </div>
             </div>
 
             <button type="submit" disabled={loading} className="w-full bg-purple-600 text-white font-bold py-5 rounded-[2rem] shadow-2xl shadow-purple-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
               {loading ? <Loader2 className="animate-spin" /> : <Save size={20} />}
-              {loading ? 'Salvando...' : 'Salvar e Gerar Link'}
+              {loading ? 'Salvando...' : 'Salvar Alterações'}
             </button>
           </form>
         </div>
       </div>
 
       <div className="flex-1 bg-slate-100 hidden md:flex flex-col items-center justify-center p-12 overflow-hidden relative">
-        <div className="absolute top-10 left-10 flex items-center gap-2 text-slate-400 font-bold uppercase tracking-widest text-xs">
-          <Sparkles size={14} className="text-purple-600" /> Prévia em Tempo Real
-        </div>
-
-        <div className="w-[340px] h-[700px] bg-slate-800 rounded-[3.5rem] p-3 border-[10px] border-slate-900 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] relative z-10 overflow-hidden">
-          <div
-            className="w-full h-full bg-white rounded-[2.8rem] overflow-y-auto no-scrollbar relative"
-            style={{
-              backgroundImage: formData.backgroundLocal
-                ? `url(${formData.backgroundLocal})`
-                : formData.backgroundUrl
-                  ? `url(${formData.backgroundUrl})`
-                  : 'none',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          >
-            {(formData.backgroundLocal || formData.backgroundUrl) && (
-              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/40" />
-            )}
-
-            <div className="relative h-64 w-full z-10">
-              <img
-                src={formData.imageLocal || formData.imageUrl || '/assets/img/template_casamento.png'}
-                alt="Capa"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-6 left-6 text-white">
-                <h4 className="text-2xl font-playfair font-bold">{formData.title}</h4>
-              </div>
-            </div>
-
-            <div className="p-8 space-y-6 relative z-10">
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 text-slate-600 bg-white/80 backdrop-blur-sm p-3 rounded-xl">
-                  <div className="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Calendar size={18} />
-                  </div>
-                  <span className="font-bold text-sm tracking-tight">{formData.date} às {formData.time}</span>
-                </div>
-                <div className="flex items-center gap-4 text-slate-600 bg-white/80 backdrop-blur-sm p-3 rounded-xl">
-                  <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <MapPin size={18} />
-                  </div>
-                  <span className="font-bold text-sm tracking-tight">{formData.location}</span>
+        <div className="w-[340px] h-[700px] bg-slate-800 rounded-[3.5rem] p-3 border-[10px] border-slate-900 shadow-2xl relative z-10 overflow-hidden">
+             <div 
+              className="w-full h-full bg-white rounded-[2.8rem] overflow-y-auto no-scrollbar relative"
+              style={{
+                backgroundImage: formData.backgroundLocal ? `url(${formData.backgroundLocal})` : (formData.backgroundUrl && formData.backgroundType === 'image' ? `url(${formData.backgroundUrl})` : 'none'),
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            >
+              <div className="relative h-64 w-full">
+                <img src={formData.imageLocal || formData.imageUrl || '/assets/img/template_casamento.png'} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/40 flex items-end p-6">
+                  <h4 className="text-2xl font-playfair font-bold text-white">{formData.title}</h4>
                 </div>
               </div>
-
-              <div className="py-6 border-y border-slate-100/50 bg-white/80 backdrop-blur-sm rounded-xl px-4">
-                <p className="text-center font-playfair italic text-slate-600 leading-relaxed">
-                  &quot;{formData.message}&quot;
-                </p>
-              </div>
-
-              <div className="pt-6">
-                <button type="button" className="w-full bg-purple-600 text-white font-bold py-4 rounded-2xl text-center text-xs tracking-widest uppercase shadow-lg shadow-purple-600/50">
-                  Confirmar Presença
-                </button>
+              <div className="p-8 space-y-4">
+                <div className="bg-slate-50 p-4 rounded-xl flex items-center gap-3 text-sm font-bold">
+                  <Calendar size={18} className="text-purple-600" /> {formData.date} às {formData.time}
+                </div>
+                <div className="bg-slate-50 p-4 rounded-xl flex items-center gap-3 text-sm font-bold">
+                  <MapPin size={18} className="text-indigo-600" /> {formData.location}
+                </div>
+                <p className="italic text-slate-600 text-center py-4">{formData.message}</p>
+                <button className="w-full bg-purple-600 text-white font-bold py-4 rounded-xl text-xs uppercase tracking-widest">Confirmar Presença</button>
               </div>
             </div>
-          </div>
         </div>
-
-        <div className="absolute top-1/4 right-[-50px] w-64 h-64 bg-purple-600/5 blur-[100px] rounded-full" />
-        <div className="absolute bottom-1/4 left-[-50px] w-64 h-64 bg-indigo-600/5 blur-[100px] rounded-full" />
       </div>
     </div>
   );
