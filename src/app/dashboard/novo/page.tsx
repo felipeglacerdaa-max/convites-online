@@ -133,6 +133,23 @@ export default function NewInvitation() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Check if it's a video
+    if (file.type.startsWith('video/')) {
+      // Check file size (Vercel limit is ~4.5MB for base64)
+      if (file.size > 4 * 1024 * 1024) {
+        setError('O vídeo é muito grande. Para vídeos locais, use arquivos de até 4MB ou use um link do YouTube.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((current) => ({ ...current, [type]: String(reader.result || '') }));
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    // If it's an image, compress it
     try {
       const compressedBase64 = await compressImage(file);
       setFormData((current) => ({ ...current, [type]: compressedBase64 }));
