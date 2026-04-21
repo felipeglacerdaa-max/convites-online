@@ -96,6 +96,12 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
 
   const toggleMusic = () => setIsPlaying(!isPlaying);
 
+  const openMap = () => {
+    if (!invitation.location) return;
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(invitation.location)}`;
+    window.open(url, '_blank');
+  };
+
   const handleRsvp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -264,7 +270,8 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
                </p>
             </div>
 
-            {/* Details Grid *            <div className="grid grid-cols-1 gap-10 pt-10 border-t border-white/20 mb-10">
+            {/* Details Grid */}
+            <div className="grid grid-cols-1 gap-10 pt-10 border-t border-white/20 mb-10">
                <div className="flex flex-col items-center text-center space-y-3">
                   <div className="w-12 h-12 bg-white/30 rounded-full flex items-center justify-center shadow-sm border border-white/30">
                     <Calendar className="text-rose-500/80" size={20} strokeWidth={1.5} />
@@ -278,22 +285,38 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
                   </div>
                </div>
  
-               <div className="flex flex-col items-center text-center space-y-3">
+               <div className="flex flex-col items-center text-center space-y-4">
                   <div className="w-12 h-12 bg-white/30 rounded-full flex items-center justify-center shadow-sm border border-white/30">
                     <MapPin className="text-rose-500/80" size={20} strokeWidth={1.5} />
                   </div>
-                  <div>
+                  <div className="space-y-2">
                     <h4 className="text-[9px] uppercase tracking-widest font-bold text-slate-500/70 mb-1">Onde</h4>
-                    <p className="font-playfair font-bold text-xl text-slate-800 max-w-[220px] leading-tight">
+                    <p className="font-playfair font-bold text-xl text-slate-900 max-w-[240px] leading-tight">
                       {invitation.location}
                     </p>
+                    
+                    {/* Embedded Map Preview */}
+                    {invitation.location && (
+                      <div className="mt-4 w-full aspect-video rounded-2xl overflow-hidden border border-white/20 shadow-inner">
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0, filter: 'grayscale(0.2) contrast(1.1)' }}
+                          loading="lazy"
+                          allowFullScreen
+                          src={`https://maps.google.com/maps?q=${encodeURIComponent(invitation.location)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                        ></iframe>
+                      </div>
+                    )}
                   </div>
-                  <button className="text-[10px] font-bold text-rose-500 hover:text-rose-600 transition-colors uppercase tracking-widest mt-2 border-b border-rose-200/50 pb-0.5">
-                    Ver no Mapa
+                  <button 
+                    onClick={openMap}
+                    className="text-[10px] font-bold text-rose-500 hover:text-rose-600 transition-all uppercase tracking-widest mt-2 border-b border-rose-200/50 pb-0.5 active:scale-95"
+                  >
+                    Abrir no Google Maps
                   </button>
                </div>
             </div>
-/div>
 
             {/* Video Preview (If exists) */}
             {invitation.videoUrl && (
