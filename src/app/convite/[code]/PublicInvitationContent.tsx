@@ -176,7 +176,7 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
         )}
       </div>
 
-      <main className={`relative z-10 max-w-lg mx-auto px-4 py-12 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+      <main className={`relative z-10 max-w-[360px] md:max-w-lg mx-auto px-4 py-12 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
         
         {/* Floating Music Button (Refined & Premium) */}
         {invitation.musicUrl && (
@@ -222,11 +222,11 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
           </div>
         )}
 
-        {/* Invitation Card Container (Minimalist Glassmorphism) */}
-        <div className="bg-white/60 backdrop-blur-2xl p-0.5 rounded-[3rem] shadow-[0_30px_100px_rgba(0,0,0,0.1)] border border-white/40 relative overflow-hidden">
+        {/* Invitation Card Container (Ultra-Minimalist Glass) */}
+        <div className="bg-white/15 backdrop-blur-3xl p-0.5 rounded-[2.5rem] shadow-[0_30px_100px_rgba(0,0,0,0.2)] border border-white/20 relative overflow-hidden">
           
           {/* Main Content Area */}
-          <div className="rounded-[2.8rem] p-8 md:p-12 relative">
+          <div className="rounded-[2.3rem] p-6 md:p-10 relative">
             
             {/* Header / Hero */}
             <header className="text-center space-y-6 mb-12">
@@ -236,9 +236,9 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
                   <div className="w-16 h-1px bg-rose-200 self-center"></div>
                </div>
                
-                <div className="space-y-3">
-                  <p className="text-[10px] uppercase tracking-[0.5em] text-rose-500/70 font-bold">Convite Especial</p>
-                  <h1 className="text-4xl md:text-6xl font-playfair font-bold text-slate-900 leading-tight">
+                <div className="space-y-2">
+                  <p className="text-[9px] uppercase tracking-[0.6em] text-rose-500/80 font-bold">Convite Especial</p>
+                  <h1 className="text-3xl md:text-5xl font-playfair font-bold text-slate-900 leading-tight">
                      {invitation.title}
                   </h1>
                 </div>
@@ -258,37 +258,37 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
             </header>
 
             {/* Message */}
-            <div className="text-center mb-16 relative">
-               <p className="font-playfair italic text-xl text-slate-700/80 leading-relaxed px-2 max-w-[280px] mx-auto">
+            <div className="text-center mb-12 relative">
+               <p className="font-playfair italic text-lg text-slate-700/90 leading-relaxed px-2 max-w-[260px] mx-auto">
                   {invitation.message}
                </p>
             </div>
 
-            {/* Details Grid *            <div className="grid grid-cols-1 gap-12 pt-12 border-t border-slate-900/5 mb-12">
-               <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="w-14 h-14 bg-white/50 rounded-full flex items-center justify-center shadow-sm border border-white/50">
-                    <Calendar className="text-rose-500/70" size={24} strokeWidth={1.5} />
+            {/* Details Grid *            <div className="grid grid-cols-1 gap-10 pt-10 border-t border-white/20 mb-10">
+               <div className="flex flex-col items-center text-center space-y-3">
+                  <div className="w-12 h-12 bg-white/30 rounded-full flex items-center justify-center shadow-sm border border-white/30">
+                    <Calendar className="text-rose-500/80" size={20} strokeWidth={1.5} />
                   </div>
                   <div>
-                    <h4 className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-2">Quando</h4>
-                    <p className="font-playfair font-bold text-2xl text-slate-800">{invitation.date}</p>
-                    <div className="flex items-center justify-center gap-2 text-slate-500 font-medium mt-1">
-                      <Clock size={14} /> <span>às {invitation.time}</span>
+                    <h4 className="text-[9px] uppercase tracking-widest font-bold text-slate-500/70 mb-1">Quando</h4>
+                    <p className="font-playfair font-bold text-xl text-slate-800">{invitation.date}</p>
+                    <div className="flex items-center justify-center gap-2 text-slate-500/80 font-medium text-xs mt-0.5">
+                      <Clock size={12} /> <span>às {invitation.time}</span>
                     </div>
                   </div>
                </div>
  
-               <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="w-14 h-14 bg-white/50 rounded-full flex items-center justify-center shadow-sm border border-white/50">
-                    <MapPin className="text-rose-500/70" size={24} strokeWidth={1.5} />
+               <div className="flex flex-col items-center text-center space-y-3">
+                  <div className="w-12 h-12 bg-white/30 rounded-full flex items-center justify-center shadow-sm border border-white/30">
+                    <MapPin className="text-rose-500/80" size={20} strokeWidth={1.5} />
                   </div>
                   <div>
-                    <h4 className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-2">Onde</h4>
-                    <p className="font-playfair font-bold text-2xl text-slate-800 max-w-[240px] leading-tight">
+                    <h4 className="text-[9px] uppercase tracking-widest font-bold text-slate-500/70 mb-1">Onde</h4>
+                    <p className="font-playfair font-bold text-xl text-slate-800 max-w-[220px] leading-tight">
                       {invitation.location}
                     </p>
                   </div>
-                  <button className="text-[11px] font-bold text-rose-500 hover:text-rose-600 transition-colors uppercase tracking-widest mt-2 border-b border-rose-200 pb-1">
+                  <button className="text-[10px] font-bold text-rose-500 hover:text-rose-600 transition-colors uppercase tracking-widest mt-2 border-b border-rose-200/50 pb-0.5">
                     Ver no Mapa
                   </button>
                </div>
@@ -297,8 +297,8 @@ export default function PublicInvitationContent({ invitation }: { invitation: an
 
             {/* Video Preview (If exists) */}
             {invitation.videoUrl && (
-              <div className="mb-12">
-                <div className="aspect-video rounded-[2rem] overflow-hidden bg-white/20 border border-white/30 shadow-xl">
+              <div className="mb-10">
+                <div className="aspect-video rounded-[2rem] overflow-hidden bg-white/10 border border-white/20 shadow-xl">
                    {invitation.videoUrl.includes('youtube.com') || invitation.videoUrl.includes('youtu.be') ? (
                      <iframe
                        className="w-full h-full"
